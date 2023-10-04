@@ -1,6 +1,7 @@
 package order;
 
 import io.qameta.allure.junit4.DisplayName;
+import io.restassured.response.Response;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -17,7 +18,6 @@ import java.util.List;
 import static org.hamcrest.CoreMatchers.equalTo;
 
 public class CreateOrderTest {
-
 
     UserApiRequests userApiRequests = new UserApiRequests();
     OrderApiRequests orderApiRequests = new OrderApiRequests();
@@ -44,45 +44,41 @@ public class CreateOrderTest {
 
     @Test
     @DisplayName("Создание заказа авторизованным пользователем")
-    public void testCreateOrderAuthUser(){
-        orderApiRequests.createOrderAuthUser(order,accessToken)
-                .then().assertThat()
-                .body("success", equalTo(true))
+    public void testCreateOrderAuthUser() {
+        Response response = orderApiRequests.createOrderAuthUser(order, accessToken);
+        response.then().statusCode(200)
                 .and()
-                .statusCode(200);
+                .body("success", equalTo(true));
     }
 
     @Test
     @DisplayName("Создание заказа неавторизованным пользователем")
-    public void testCreateOrderNotAuthUser(){
-        orderApiRequests.createOrderNotAuthUser(order)
-                .then().assertThat()
-                .body("success", equalTo(true))
+    public void testCreateOrderNotAuthUser() {
+        Response response = orderApiRequests.createOrderNotAuthUser(order);
+        response.then().statusCode(200)
                 .and()
-                .statusCode(200);
+                .body("success", equalTo(true));
     }
 
     @Test
     @DisplayName("Создание заказа без ингредиентов, авторизованный пользователь")
-    public void testCreateOrderNoIngredients(){
+    public void testCreateOrderNoIngredients() {
         ingredients.clear();
         order = new Order(ingredients);
-        orderApiRequests.createOrderAuthUser(order,accessToken)
-                .then().assertThat()
-                .body("success", equalTo(false))
+        Response response = orderApiRequests.createOrderAuthUser(order, accessToken);
+        response.then().statusCode(400)
                 .and()
-                .statusCode(400);
+                .body("success", equalTo(false));
     }
 
     @Test
     @DisplayName("Создание заказа c неверным хешем ингредиентов")
-    public void testCreateOrderWithWrongHash(){
+    public void testCreateOrderWithWrongHash() {
         ingredients.clear();
         ingredients.add("wrong");
         order = new Order(ingredients);
-        orderApiRequests.createOrderAuthUser(order,accessToken)
-                .then().assertThat()
-                .statusCode(500);
+        Response response = orderApiRequests.createOrderAuthUser(order, accessToken);
+        response.then().statusCode(500);
     }
 
     @After
@@ -91,6 +87,5 @@ public class CreateOrderTest {
             userApiRequests.deleteUser(accessToken);
         }
     }
-
 }
 
