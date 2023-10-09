@@ -1,5 +1,6 @@
 package user;
 
+import io.restassured.response.Response;
 import io.qameta.allure.junit4.DisplayName;
 import org.junit.After;
 import org.junit.Before;
@@ -23,57 +24,51 @@ public class RegistrationUserTest {
 
     @Test
     @DisplayName("Регистрация пользователя")
-    public void testCreateUser(){
-        userApiRequests.createUser(user)
-                .then().assertThat()
-                .body("success", equalTo(true))
-                .and()
-                .statusCode(200);
+    public void testCreateUser() {
+        Response response = userApiRequests.createUser(user);
+        response.then().statusCode(200)
+                .assertThat()
+                .body("success", equalTo(true));
     }
 
     @Test
-    @DisplayName("Регистрация пользователя с данными уже зареганого пользователя")
-    public void testCreateDuplicateUser(){
+    @DisplayName("Регистрация пользователя с данными уже зарегистрированного пользователя")
+    public void testCreateDuplicateUser() {
         userApiRequests.createUser(user);
-        userApiRequests.createUser(user)
-                .then().assertThat()
-                .body("success", equalTo(false))
-                .and()
-                .statusCode(403);
+        Response response = userApiRequests.createUser(user);
+        response.then().statusCode(403)
+                .assertThat()
+                .body("success", equalTo(false));
     }
 
     @Test
     @DisplayName("Регистрация пользователя без email")
-    public void testCreateUserWithoutEmail(){
+    public void testCreateUserWithoutEmail() {
         user.setEmail("");
-        userApiRequests.createUser(user)
-                .then().assertThat()
-                .body("success", equalTo(false))
-                .and()
-                .statusCode(403);
+        Response response = userApiRequests.createUser(user);
+        response.then().statusCode(403)
+                .assertThat()
+                .body("success", equalTo(false));
     }
 
     @Test
     @DisplayName("Регистрация пользователя без пароля")
-    public void testCreateUserWithoutPassword(){
+    public void testCreateUserWithoutPassword() {
         user.setPassword("");
-        userApiRequests.createUser(user)
-                .then().assertThat()
-                .body("success", equalTo(false))
-                .and()
-                .statusCode(403);
-
+        Response response = userApiRequests.createUser(user);
+        response.then().statusCode(403)
+                .assertThat()
+                .body("success", equalTo(false));
     }
 
     @Test
     @DisplayName("Регистрация пользователя без имени")
-    public void testCreateUserWithoutName(){
+    public void testCreateUserWithoutName() {
         user.setName("");
-        userApiRequests.createUser(user)
-                .then().assertThat()
-                .body("success", equalTo(false))
-                .and()
-                .statusCode(403);
+        Response response = userApiRequests.createUser(user);
+        response.then().statusCode(403)
+                .assertThat()
+                .body("success", equalTo(false));
     }
 
     @After

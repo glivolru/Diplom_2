@@ -1,6 +1,6 @@
 package user;
 
-import io.qameta.allure.Description;
+import io.restassured.response.Response;
 import io.qameta.allure.junit4.DisplayName;
 import org.junit.After;
 import org.junit.Before;
@@ -24,34 +24,33 @@ public class LoginUserTest {
 
     @Test
     @DisplayName("Авторизация пользователя")
-    public void testLoginUser(){
-        userApiRequests.loginUser(user)
-                .then().assertThat()
-                .body("success", equalTo(true))
-                .and()
-                .statusCode(200);
+    public void testLoginUser() {
+        Response response = userApiRequests.loginUser(user);
+        response.then().statusCode(200)
+                .assertThat()
+                .body("success", equalTo(true));
     }
 
     @Test
     @DisplayName("Авторизация с некорректным email")
-    public void testLoginUserIncorrectEmail(){
+    public void testLoginUserIncorrectEmail() {
         user.setEmail("uuuuuaaaaa@yandex");
-        userApiRequests.loginUser(user)
-                .then().assertThat()
-                .body("success", equalTo(false))
-                .and()
-                .statusCode(401);
+        Response response = userApiRequests.loginUser(user);
+        response.then().statusCode(401)
+                .assertThat()
+                .body("success", equalTo(false));
     }
 
     @Test
     @DisplayName("Авторизация с некорректным паролем")
-    public void testLoginUserIncorrectPassword(){
+    public void testLoginUserIncorrectPassword() {
         user.setPassword("@)20$!@$");
-        userApiRequests.loginUser(user)
-                .then().assertThat().body("success", equalTo(false))
-                .and()
-                .statusCode(401);
+        Response response = userApiRequests.loginUser(user);
+        response.then().statusCode(401)
+                .assertThat()
+                .body("success", equalTo(false));
     }
+
 
     @After
     public void deleteUser(){

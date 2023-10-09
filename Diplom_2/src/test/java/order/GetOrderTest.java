@@ -1,6 +1,7 @@
 package order;
 
 import io.qameta.allure.junit4.DisplayName;
+import io.restassured.response.Response;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -31,7 +32,7 @@ public class GetOrderTest {
     private Order order;
 
     @Before
-    public void setUp(){
+    public void setUp() {
         BaseUrl.setUp();
         ingredientList = ingredientApiRequests.getIngredientInfo();
         ingredients = new ArrayList<>();
@@ -45,31 +46,28 @@ public class GetOrderTest {
 
     @Test
     @DisplayName("Получение списка заказов, авторизованный пользователь")
-    public void testGetOrderAuthUser(){
-        orderApiRequests.getOrdersAuthUser(accessToken)
-                .then().assertThat()
-                .body("success", equalTo(true))
-                .and()
-                .statusCode(200);
+    public void testGetOrderAuthUser() {
+        Response response = orderApiRequests.getOrdersAuthUser(accessToken);
+        response.then().statusCode(200)
+                .assertThat()
+                .body("success", equalTo(true));
     }
 
     @Test
     @DisplayName("Получение списка заказов, неавторизованный пользователь")
-    public void testGetOrderNotAuthUser(){
-        orderApiRequests.getOrdersNotAuthUser()
-                .then().assertThat()
-                .body("success", equalTo(false))
-                .and()
-                .statusCode(401);
+    public void testGetOrderNotAuthUser() {
+        Response response = orderApiRequests.getOrdersNotAuthUser();
+        response.then().statusCode(401)
+                .assertThat()
+                .body("success", equalTo(false));
     }
 
     @After
-    public void deleteUser(){
-        if (accessToken!=null) {
+    public void deleteUser() {
+        if (accessToken != null) {
             userApiRequests.deleteUser(accessToken);
         }
     }
-
-
 }
+
 
